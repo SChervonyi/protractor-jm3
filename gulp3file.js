@@ -35,13 +35,17 @@ var runSpawn = function(done, task, opt_arg, opt_io) {
   });
 };
 
-function tslint() {
+gulp.task('tslint', function() {
   return gulp.src(['lib/**/*.ts', 'spec/**/*.ts', '!spec/install/**/*.ts'])
       .pipe(tslint()).pipe(tslint.report());
-};
+});
+
+gulp.task('lint', function(done) {
+  runSequence('tslint', 'jshint', 'format:enforce', done);
+});
 
 // prevent contributors from using the wrong version of node
-function checkVersion(done) {
+gulp.task('checkVersion', function(done) {
   // read minimum node on package.json
   var packageJson = JSON.parse(fs.readFileSync(path.resolve('package.json')));
   var protractorVersion = packageJson.version;
@@ -53,65 +57,62 @@ function checkVersion(done) {
     throw new Error('minimum node version for Protractor ' +
         protractorVersion + ' is node ' + nodeVersion);
   }
-};
+});
 
-function builtCopy(done) {
+gulp.task('built:copy', function(done) {
   return gulp.src(['lib/**/*.js'])
       .pipe(gulp.dest('built/'));
   done();
-};
+});
 
-function webdriverUpdate(done) {
+gulp.task('webdriver:update', function(done) {
   runSpawn(done, 'node', ['bin/webdriver-manager', 'update']);
-};
+});
 
-function jshint(done) {
+gulp.task('jshint', function(done) {
   runSpawn(done, 'node', ['node_modules/jshint/bin/jshint', '-c',
       '.jshintrc', 'lib', 'spec', 'scripts',
       '--exclude=lib/selenium-webdriver/**/*.js,lib/webdriver-js-extender/**/*.js,' +
       'spec/dependencyTest/*.js,spec/install/**/*.js']);
-};
+});
 
-function formatEnforce() {
+gulp.task('format:enforce', function() {
   var format = require('gulp-clang-format');
   var clangFormat = require('clang-format');
   return gulp.src(['lib/**/*.ts']).pipe(
     format.checkFormat('file', clangFormat, {verbose: true, fail: true}));
-};
+});
 
-function format() {
+gulp.task('format', function() {
   var format = require('gulp-clang-format');
   var clangFormat = require('clang-format');
   return gulp.src(['lib/**/*.ts'], { base: '.' }).pipe(
     format.format('file', clangFormat)).pipe(gulp.dest('.'));
-};
+});
 
-function tsc(done) {
+gulp.task('tsc', function(done) {
   runSpawn(done, 'node', ['node_modules/typescript/bin/tsc']);
-};
+});
 
-function tscSpec(done) {
+gulp.task('tsc:spec', function(done) {
   runSpawn(done, 'node', ['node_modules/typescript/bin/tsc', '-p', 'ts_spec_config.json']);
-};
+});
 
-function tsc_es5(done) {
+gulp.task('tsc:es5', function(done) {
   runSpawn(done, './scripts/compile_to_es5.sh');
-};
+});
 
-const compile_to_es5 = gulp.series(checkVersion, tsc_es5, builtCopy);
+gulp.task('compile_to_es5', function(done) {
+  runSequence('checkVersion', 'tsc:es5', 'built:copy', done);
+});
 
-const prepublish = gulp.series(checkVersion, tsc, builtCopy);
+gulp.task('prepublish', function(done) {
+  runSequence('checkVersion', 'tsc', 'built:copy', done);
+});
 
-const pretest = gulp.series(checkVersion, gulp.series(tslint, format), tsc, builtCopy, tscSpec);
+gulp.task('pretest', function(done) {
+  runSequence('checkVersion',
+    ['tslint', 'format'], 'tsc', 'built:copy', 'tsc:spec',  done);
+});
 
-const lint = gulp.series(tslint, jshint, formatEnforce);
-
-exports.default = prepublish;
-
-exports.prepublish = prepublish;
-exports.pretest = pretest;
-exports.compile_to_es5 = compile_to_es5;
-exports.tslint = tslint;
-exports.lint = lint;
-exports.checkVersion = checkVersion;
-exports.webdriverUpdate = webdriverUpdate;
+gulp.task('default',['prepublish']);
