@@ -1,3 +1,10 @@
+<span style="color:red">Important</span>
+==========
+
+This is [protractor 5.4.3](https://www.npmjs.com/package/protractor) fork with updated Jasmine up to jasmine 3.5.0.
+The reason to update from jasmine 2.x to jasmine 3.x is support async report hooks [see details](https://jasmine.github.io/tutorials/custom_reporter).
+Also updated: TypeScript up to 3.5, TSLint up to 5.20 and Gulp up to 4.0
+
 Protractor [![Build Status](https://travis-ci.org/angular/protractor.svg?branch=master)](https://travis-ci.org/angular/protractor) [![CircleCI Status](https://circleci.com/gh/angular/protractor.svg?style=shield)](https://circleci.com/gh/angular/protractor) [![Join the chat at https://gitter.im/angular/protractor](https://badges.gitter.im/angular/protractor.svg)](https://gitter.im/angular/protractor)
 ==========
 
