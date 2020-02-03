@@ -35,7 +35,7 @@
     "@types/jasminewd2": "^2.0.8",
     "@types/minimatch": "^2.0.28",
     "@types/minimist": "^1.1.28",
-    "@types/node": "^10.17.14",
+    "@types/node": "^8.10.59",
     "@types/optimist": "^0.0.29",
     "body-parser": "~1.15.2",
     "chai": "~3.5.0",
@@ -81,7 +81,7 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=10.18.1"
+    "node": ">=8.15.0"
   },
-  "version": "1.0.2"
+  "version": "1.0.3"
 }
